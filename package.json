@@ -1,0 +1,14 @@
+{
+  "name": "elife-ai",
+  "version": "0.1.0",
+  "description": "The Avatar Brain",
+  "main": "index.js",
+  "repository": "https://github.com/everlifeai/elife-ai",
+  "author": "charles.lobo@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "cakechat": "lukalabs/cakechat",
+    "cote": "^0.17.0",
+    "elife-utils": "everlifeai/elife-utils"
+  }
+}
