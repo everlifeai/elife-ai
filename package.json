@@ -7,8 +7,8 @@
   "author": "charles.lobo@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "cakechat": "lukalabs/cakechat",
     "cote": "^0.17.0",
-    "elife-utils": "everlifeai/elife-utils"
+    "elife-utils": "everlifeai/elife-utils",
+    "request": "^2.87.0"
   }
 }
