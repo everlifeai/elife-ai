@@ -42,14 +42,18 @@ function loadConfig() {
  * speak) to perhaps get a better response.
  * There can be an array of such responses AI's available via HTTP
  * requests. We try the first, then move on to the second and so on.
- * This array is mantained via the immortal feed.
+ * This array is mantained in a `brains.json` file.
  *
  * TODO: Detail the request/response format so responses can activate
  * skills, add tasks, and so on.
  */
 function loadAIProcessors() {
-    // TODO: Get the avatar options from the ssb feed.
-    return []
+    try {
+        return JSON.parse(fs.readFileSync('brains.json', 'utf8'))
+    } catch(e) {
+        u.showErr(e)
+        return []
+    }
 }
 
 
