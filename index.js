@@ -3,6 +3,7 @@ const cote = require('cote')
 const fs = require('fs')
 const u = require('elife-utils')
 const request = require('request')
+const Mustache = require('mustache')
 
 
 /*      understand/
@@ -95,9 +96,11 @@ function getResponse(cfg, req, cb) {
         if(!cfg.brains || ndx >= cfg.brains.length) {
             get_simple_response()
         } else {
-            request(cfg.brains[ndx], { timeout: cfg.AI_REQ_TIMEOUT }, (err, resp, body) => {
+
+            var options = addReqData(req,cfg.brains[ndx]);
+            request(options, (err, resp, body) => {
                 if(err) get_response_from_1(ndx+1)
-                else cb(null, resp)
+                else cb(body)
             })
         }
     }
@@ -109,14 +112,17 @@ function getResponse(cfg, req, cb) {
      * various cases.
      */
     function get_simple_response() {
-        cb(null, "I'm sorry - I seem to be having trouble understanding you right now")
+        cb( "I'm sorry - I seem to be having trouble understanding you right now")
     }
 }
 
 function addReqData(req, opts) {
     // TODO: Take the request data and update the new options object with
     // the data to send to the AI
-    return u.shallowClone(opts)
+    
+    opts = Mustache.render(JSON.stringify(opts), {data: req.data});
+    
+    return u.shallowClone(JSON.parse(opts))
 }
 
 function processRespData(resp) {
