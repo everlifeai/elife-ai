@@ -98,9 +98,11 @@ function getResponse(cfg, req, cb) {
         } else {
 
             var options = addReqData(req,cfg.brains[ndx]);
+            options['timeout'] = cfg.AI_REQ_TIMEOUT;
+            
             request(options, (err, resp, body) => {
                 if(err) get_response_from_1(ndx+1)
-                else cb(body)
+                else cb(null, body)
             })
         }
     }
@@ -112,17 +114,19 @@ function getResponse(cfg, req, cb) {
      * various cases.
      */
     function get_simple_response() {
-        cb( "I'm sorry - I seem to be having trouble understanding you right now")
+        cb(null, "I'm sorry - I seem to be having trouble understanding you right now")
     }
 }
 
+/*      outcome/
+ *   Updating the options object with user requested data. 
+ * 
+ */
 function addReqData(req, opts) {
-    // TODO: Take the request data and update the new options object with
-    // the data to send to the AI
     
-    opts = Mustache.render(JSON.stringify(opts), {data: req.data});
-    
-    return u.shallowClone(JSON.parse(opts))
+    opts = Mustache.render(JSON.stringify(opts), {context: req.context});
+
+    return JSON.parse(opts)
 }
 
 function processRespData(resp) {
