@@ -15,10 +15,10 @@ Intelligence via HTTP services. Multiple services can be added into a
 ```js
 [
     {
-        "uri": "http://localhost:8080/cakechat_api/v1/actions/get_response",
+        "uri": "http://localhost:8080/everlife_ai_chat/v1/actions/get_response",
         "method": "POST",
         "json": {
-            "context": ["{{data}}"]
+            "context": ["{{context}}"]
         }
     }
 ]
