@@ -123,10 +123,13 @@ function getResponse(cfg, req, cb) {
  * 
  *      way/
  * We specify the ai request as a moustache template and use mustache to merge
- * the user message into the request.
+ * the user message into the request. The messages are sent in a
+ * `context` parameter that contains the current message as well as a
+ * few of the previous chat messages to allow the AI to mantain context.
+ * TODO: Send previous messages for context
  */
 function addReqData(req, opts) {
-    opts = Mustache.render(JSON.stringify(opts), {context: req.context});
+    opts = Mustache.render(JSON.stringify(opts), {context: [req.msg]});
     return JSON.parse(opts)
 }
 
