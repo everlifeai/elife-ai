@@ -3,7 +3,6 @@ const cote = require('cote')
 const fs = require('fs')
 const u = require('elife-utils')
 const request = require('request')
-const Mustache = require('mustache')
 
 
 /*      understand/
@@ -29,7 +28,7 @@ function loadConfig() {
         cfg.AI_REQ_TIMEOUT = "500"
     }
 
-    cfg.brains = loadAIProcessors()
+    cfg.brains = loadAIProcessorTpls()
 
     return cfg;
 }
@@ -48,12 +47,12 @@ function loadConfig() {
  * TODO: Detail the request/response format so responses can activate
  * skills, add tasks, and so on.
  */
-function loadAIProcessors() {
+function loadAIProcessorTpls() {
     try {
-        return JSON.parse(fs.readFileSync('brains.json', 'utf8'))
+        return fs.readFileSync('brains.json', 'utf8')
     } catch(e) {
         u.showErr(e)
-        return []
+        return "[]"
     }
 }
 
@@ -90,14 +89,15 @@ function wakeUpAI(cfg) {
  * handle here by default.
  */
 function getResponse(cfg, req, cb) {
+    let ais = loadAIProcessors(req, cfg.brains);
     get_response_from_1(0)
 
     function get_response_from_1(ndx) {
-        if(!cfg.brains || ndx >= cfg.brains.length) {
+        if(!ais || ndx >= ais.length) {
             get_simple_response()
         } else {
 
-            var options = addReqData(req,cfg.brains[ndx]);
+            var options = ais[ndx];
             options['timeout'] = cfg.AI_REQ_TIMEOUT;
 
             request(options, (err, resp, body) => {
@@ -119,18 +119,25 @@ function getResponse(cfg, req, cb) {
 }
 
 /*      problem/
- * We need to send the user's message to the ai in whatever format it wants.
+ * We need to send the user's message to various AI's in the format's
+ * that they require.
  * 
  *      way/
- * We specify the ai request as a moustache template and use mustache to merge
- * the user message into the request. The messages are sent in a
- * `context` parameter that contains the current message as well as a
- * few of the previous chat messages to allow the AI to mantain context.
+ * We specify all the AI requests as a JSON array that contains the
+ * pattern
+ *      `{{context}}`
+ * wherever the current messages (and a few previous messages for
+ * context) are required by the AI.
  * TODO: Send previous messages for context
  */
-function addReqData(req, opts) {
-    opts = Mustache.render(JSON.stringify(opts), {context: [req.msg]});
-    return JSON.parse(opts)
+function loadAIProcessors(req, tpls) {
+    let aiprocessors = tpls.replace("{{context}}",JSON.stringify([req.msg]));
+    try {
+        return JSON.parse(aiprocessors)
+    } catch(e) {
+        u.showErr(e)
+        return []
+    }
 }
 
 function processRespData(resp) {
