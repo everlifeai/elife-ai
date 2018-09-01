@@ -4,6 +4,10 @@ const fs = require('fs')
 const u = require('elife-utils')
 const request = require('request')
 
+const ssbClient = new cote.Requester({
+    name: 'Everlife SSB Client',
+    key: 'everlife-ssb-svc',
+})
 
 /*      understand/
  * This is the main entry point where we start.
@@ -99,10 +103,13 @@ function getResponse(cfg, req, cb) {
 
             var options = ais[ndx];
             options['timeout'] = cfg.AI_REQ_TIMEOUT;
-
+            saveMsgInSSB(req.msg)
             request(options, (err, resp, body) => {
                 if(err) get_response_from_1(ndx+1)
-                else cb(null, body)
+                else {
+                    saveMsgInSSB(body)
+                    cb(null, body)
+                }
             })
         }
     }
@@ -143,6 +150,19 @@ function loadAIProcessors(req, tpls) {
 function processRespData(resp) {
     // TODO: take the response data and convert into tasks etc
     return resp
+}
+
+/*    outcome/
+ * Save a chat message in SSB
+ * TODO: Create a proper message format
+ */
+function saveMsgInSSB(message){
+    ssbClient.send({
+        type: 'new-msg',
+        msg: { type: "chat msg", content:message }
+    }, (err) => {
+        if(err) u.showErr(err)
+    })
 }
 
 main()
