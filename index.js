@@ -94,7 +94,7 @@ function getResponse(cfg, req, cb) {
 
     function get_response_from_1(ndx) {
         if(!ais || ndx >= ais.length) {
-            get_simple_response()
+            get_simple_response_1(req.msg)
         } else {
 
             var options = ais[ndx];
@@ -113,8 +113,9 @@ function getResponse(cfg, req, cb) {
      * TODO: Parse the response and try to respond intelligently to
      * various cases.
      */
-    function get_simple_response() {
-        cb(null, "I'm sorry - I seem to be having trouble understanding you right now")
+    function get_simple_response_1(msg) {
+        if(msg == "hi") cb(null, "Hi! How's it going?")
+        else cb()
     }
 }
 
@@ -138,11 +139,6 @@ function loadAIProcessors(req, tpls) {
         u.showErr(e)
         return []
     }
-}
-
-function processRespData(resp) {
-    // TODO: take the response data and convert into tasks etc
-    return resp
 }
 
 main()
