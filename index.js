@@ -102,7 +102,11 @@ function getResponse(cfg, req, cb) {
 
             request(options, (err, resp, body) => {
                 if(err) get_response_from_1(ndx+1)
-                else cb(null, body)
+                else {
+                    // TODO: extract responses from various ai formats
+                    if(body.response) cb(null, body.response)
+                    else cb(null, body)
+                }
             })
         }
     }
