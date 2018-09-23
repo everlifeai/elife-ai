@@ -51,7 +51,7 @@ function loadAIProcessorTpls() {
     try {
         return fs.readFileSync('brains.json', 'utf8')
     } catch(e) {
-        u.showErr(e)
+        if(e.code != 'ENOENT') u.showErr(e)
         return "[]"
     }
 }
