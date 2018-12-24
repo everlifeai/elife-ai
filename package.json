@@ -9,6 +9,7 @@
   "dependencies": {
     "cote": "^0.17.0",
     "elife-utils": "everlifeai/elife-utils",
+    "pm2": "^3.2.4",
     "request": "^2.87.0"
   }
 }

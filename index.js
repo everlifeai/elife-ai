@@ -3,6 +3,8 @@ const cote = require('cote')({statusLogsEnabled:false})
 const fs = require('fs')
 const u = require('elife-utils')
 const request = require('request')
+const pm2 = require('pm2')
+const path = require('path')
 
 
 /*      understand/
@@ -57,25 +59,48 @@ function loadAIProcessorTpls() {
 }
 
 
+/*      outcome/
+ * Start up our local brains and our microservice
+ */
 function wakeUpAI(cfg) {
-
-    /*      understand/
-     * The ai microservice (partitioned by key `everlife-ai-svc` to
-     * prevent conflicting with other services.
-     */
-    const aiSvc = new cote.Responder({
-        name: 'Everlife AI Service',
-        key: 'everlife-ai-svc',
-    })
-
+    start_brains_1()
+    start_ms_1()
 
     /*      outcome/
-     * Responds to a request for a chat response
+     * Use PM2 to start the AIML brain
      */
-    aiSvc.on('get-response', (req, cb) => {
-        getResponse(cfg, req, cb)
-    })
+    function start_brains_1() {
+        pm2.connect((err) => {
+            if(err) u.showErr(err)
+            else pm2.start({
+                name: 'aiml-brain',
+                script: "index.js",
+                cwd: './brains/ebrain-aiml',
+                log: path.join(__dirname, 'brains/ebrain-aiml/logs/aiml-brain.log'),
+            }, (err) =>{
+                if(err) u.showErr(err)
+            })
+        })
+    }
 
+    function start_ms_1() {
+        /*      understand/
+         * The ai microservice (partitioned by key `everlife-ai-svc` to
+         * prevent conflicting with other services.
+         */
+        const aiSvc = new cote.Responder({
+            name: 'Everlife AI Service',
+            key: 'everlife-ai-svc',
+        })
+
+
+        /*      outcome/
+         * Responds to a request for a chat response
+         */
+        aiSvc.on('get-response', (req, cb) => {
+            getResponse(cfg, req, cb)
+        })
+    }
 }
 
 /*
@@ -98,6 +123,9 @@ function getResponse(cfg, req, cb) {
         } else {
 
             var options = ais[ndx];
+            if(options.body && typeof options.body === 'object') {
+                options.body = JSON.stringify(options.body)
+            }
             options['timeout'] = cfg.AI_REQ_TIMEOUT;
 
             request(options, (err, resp, body) => {
