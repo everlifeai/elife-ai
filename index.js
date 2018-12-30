@@ -164,7 +164,7 @@ function getResponse(cfg, req, cb) {
  * TODO: Send previous messages for context
  */
 function loadAIProcessors(req, tpls) {
-    let aiprocessors = tpls.replace("{{context}}",JSON.stringify([req.msg]));
+    let aiprocessors = tpls.replace(/{{context}}/g, JSON.stringify([req.msg]))
     try {
         return JSON.parse(aiprocessors)
     } catch(e) {
