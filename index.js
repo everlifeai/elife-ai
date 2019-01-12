@@ -129,7 +129,7 @@ function getResponse(cfg, req, cb) {
             options['timeout'] = cfg.AI_REQ_TIMEOUT;
 
             request(options, (err, resp, body) => {
-                if(err) get_response_from_1(ndx+1)
+                if(err || !body) get_response_from_1(ndx+1)
                 else {
                     // TODO: extract responses from various ai formats
                     if(body.response) cb(null, body.response)
