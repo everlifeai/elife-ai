@@ -100,7 +100,25 @@ function wakeUpAI(cfg) {
         aiSvc.on('get-response', (req, cb) => {
             getResponse(cfg, req, cb)
         })
+
+        /*      outcome/
+         * Respond to a request for kb information
+         */
+        aiSvc.on('get-kb-response', (req, cb) => {
+            getKBResponse(req, cb)
+        })
     }
+}
+
+const aimlClient = new cote.Requester({
+    name: 'ElifeAI -> Everlife AIML Brain',
+    key: 'ebrain-aiml',
+})
+function getKBResponse(req, cb) {
+    aimlClient.send({
+        type: 'kb-msg',
+        msg: req.msg,
+    }, cb)
 }
 
 /*
@@ -111,13 +129,30 @@ function wakeUpAI(cfg) {
  * We 'call out' for responses to various modules - starting from what
  * we think would be most helpful and moving methodically through the
  * list until, at last, we default to some simple response we can
- * handle here by default.
+ * handle here by default. We start with the KB module then move on to
+ * user-defined AI modules (from `brains.json`).
  */
 function getResponse(cfg, req, cb) {
-    let ais = loadAIProcessors(req, cfg.brains);
-    get_response_from_1(0)
+    get_kb_response_1(req, (err, resp) => {
+        if(err) {
+            u.showErr(err)
+            get_response_from_1(loadAIProcessors(req, cfg.brains), 0)
+        } else {
+            if(resp) cb(null, resp)
+            else {
+                get_response_from_1(loadAIProcessors(req, cfg.brains), 0)
+            }
+        }
+    })
 
-    function get_response_from_1(ndx) {
+    function get_kb_response_1(req, cb) {
+        aimlClient.send({
+            type: 'user-msg',
+            msg: req.msg,
+        }, cb)
+    }
+
+    function get_response_from_1(ais, ndx) {
         if(!ais || ndx >= ais.length) {
             get_simple_response_1(req.msg)
         } else {
@@ -129,7 +164,7 @@ function getResponse(cfg, req, cb) {
             options['timeout'] = cfg.AI_REQ_TIMEOUT;
 
             request(options, (err, resp, body) => {
-                if(err || !body) get_response_from_1(ndx+1)
+                if(err || !body) get_response_from_1(ais, ndx+1)
                 else {
                     // TODO: extract responses from various ai formats
                     if(body.response) cb(null, body.response)
