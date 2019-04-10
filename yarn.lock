@@ -774,7 +774,7 @@ ecc-jsbn@~0.1.1:
 
 elife-utils@everlifeai/elife-utils:
   version "0.1.0"
-  resolved "https://codeload.github.com/everlifeai/elife-utils/tar.gz/413f9febb294ebc66583dbdac79d2804dc4986db"
+  resolved "https://codeload.github.com/everlifeai/elife-utils/tar.gz/e788d18fa80eabf5ff916cd30fd25a47ff74971a"
 
 emitter-listener@^1.1.1:
   version "1.1.2"
