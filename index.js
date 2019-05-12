@@ -70,7 +70,7 @@ function wakeUpAI(cfg) {
      * Use PM2 to start the AIML brain
      */
     function start_brains_1() {
-        pm2.connect((err) => {
+        pm2.connect(true, (err) => {
             if(err) u.showErr(err)
             else pm2.start({
                 name: 'aiml-brain',
