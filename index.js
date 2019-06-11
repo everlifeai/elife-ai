@@ -75,7 +75,7 @@ function wakeUpAI(cfg) {
             else pm2.start({
                 name: 'aiml-brain',
                 script: "index.js",
-                cwd: './brains/ebrain-aiml',
+                cwd: path.join(__dirname, 'brains/ebrain-aiml'),
                 log: path.join(u.logsLoc(), 'aiml-brain.log'),
             }, (err) =>{
                 if(err) u.showErr(err)
