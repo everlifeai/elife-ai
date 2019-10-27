@@ -1,7 +1,7 @@
 'use strict'
 const cote = require('cote')({statusLogsEnabled:false})
 const fs = require('fs')
-const u = require('elife-utils')
+const u = require('@elife/utils')
 const request = require('request')
 const pm2 = require('pm2')
 const path = require('path')
