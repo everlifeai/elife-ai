@@ -3,7 +3,7 @@ const cote = require('cote')({statusLogsEnabled:false})
 const fs = require('fs')
 const u = require('@elife/utils')
 const request = require('request')
-const pm2 = require('pm2')
+const pm2 = require('@elife/pm2')
 const path = require('path')
 
 
@@ -70,16 +70,13 @@ function wakeUpAI(cfg) {
      * Use PM2 to start the AIML brain
      */
     function start_brains_1() {
-        pm2.connect(true, (err) => {
+        pm2.start({
+            name: 'aiml-brain',
+            script: "index.js",
+            cwd: path.join(__dirname, 'brains/ebrain-aiml'),
+            log: path.join(u.logsLoc(), 'aiml-brain.log'),
+        }, (err) => {
             if(err) u.showErr(err)
-            else pm2.start({
-                name: 'aiml-brain',
-                script: "index.js",
-                cwd: path.join(__dirname, 'brains/ebrain-aiml'),
-                log: path.join(u.logsLoc(), 'aiml-brain.log'),
-            }, (err) =>{
-                if(err) u.showErr(err)
-            })
         })
     }
 
