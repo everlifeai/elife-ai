@@ -75,6 +75,7 @@ function wakeUpAI(cfg) {
             script: "index.js",
             cwd: path.join(__dirname, 'brains/ebrain-aiml'),
             log: path.join(u.logsLoc(), 'aiml-brain.log'),
+            stripANSI: true,
         }, (err) => {
             if(err) u.showErr(err)
         })
