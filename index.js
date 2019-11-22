@@ -51,7 +51,7 @@ function loadConfig() {
  */
 function loadAIProcessorTpls() {
     try {
-        return fs.readFileSync('brains.json', 'utf8')
+        return fs.readFileSync(path.join(__dirname, 'brains.json'), 'utf8')
     } catch(e) {
         if(e.code != 'ENOENT') u.showErr(e)
         return "[]"
