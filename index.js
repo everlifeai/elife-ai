@@ -5,8 +5,8 @@ const u = require('@elife/utils')
 const request = require('request')
 const pm2 = require('@elife/pm2')
 const path = require('path')
-
-
+const makeOriginal = require("./makeOriginal")
+const makeEnglish = require("./makeEnglish")
 /*      understand/
  * This is the main entry point where we start.
  *
@@ -96,8 +96,19 @@ function wakeUpAI(cfg) {
          * Responds to a request for a chat response
          */
         aiSvc.on('get-response', (req, cb) => {
-            getResponse(cfg, req, cb)
-        })
+            req.orig = req.msg
+            makeEnglish(req, (err, englishmsg) => {
+                    if (!err){
+                        req.msg = englishmsg
+                        getResponse(cfg, req, (err,resp)=>{
+                            if(req.orig != req.msg){
+                                makeOriginal(req, resp, cb)
+                            }
+                            else cb(err,resp)
+                            })
+                        }
+                    })
+                })
 
         /*      outcome/
          * Respond to a request for kb information
@@ -187,7 +198,7 @@ function getResponse(cfg, req, cb) {
 /*      problem/
  * We need to send the user's message to various AI's in the format's
  * that they require.
- * 
+ *
  *      way/
  * We specify all the AI requests as a JSON array that contains the
  * pattern
