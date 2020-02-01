@@ -93,29 +93,32 @@ function wakeUpAI(cfg) {
 
 
         /*      outcome/
-         * Responds to a request for a chat response
+         * Responds to a request for a chat response, translating from
+         * from-and-to any supported languages.
          */
         aiSvc.on('get-response', (req, cb) => {
-            req.orig = req.msg
-            makeEnglish(req, (err, englishmsg) => {
-              if (!err){
-                req.msg = englishmsg
-                getResponse(cfg, req, (err,resp)=>{
-                  if(req.orig != req.msg) {
-                    makeOriginal(req.lang, resp, (err, msg)=> {
-                      if(err) {
-                        console.error(err)
-                        cb(null, resp)
-                      } else {
-                        cb(null, msg)
-                      }
-                    })
+          req.orig = req.msg
+          makeEnglish(req, (err, lang, englishmsg) => {
+            if(err) {
+              console.error(err)
+            } else {
+              if(lang && englishmsg) req.msg = englishmsg
+            }
+            getResponse(cfg, req, (err, resp)=>{
+              if(lang && lang != "en" && req.orig != req.msg) {
+                makeOriginal(lang, resp, (err, msg)=> {
+                  if(err) {
+                    console.error(err)
+                    cb(null, resp)
                   } else {
-                    cb(err,resp)
+                    cb(null, msg)
                   }
                 })
+              } else {
+                cb(err,resp)
               }
             })
+          })
         })
 
         /*      outcome/

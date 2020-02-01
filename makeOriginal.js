@@ -3,7 +3,7 @@ const request = require("request")
 const supportedForeignLanguages = ["es","de"]
 
 // This function will convert the english response from elife-ai to the original language that the avatar user had given.
-function makeOriginal(lang,msg,callback) {
+function makeOriginal(lang, msg, callback) {
 
   if (supportedForeignLanguages.includes(lang)) {
     let translate_options = {
@@ -13,7 +13,7 @@ function makeOriginal(lang,msg,callback) {
         from_lang: "en",
         to_lang : lang
       }}
-    request.post(translate_options, function(error,result){
+    request.post(translate_options, function(error,result) {
       if(error || (result.statusCode == 404)){
         callback(error, msg)
       } else {

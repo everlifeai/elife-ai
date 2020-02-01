@@ -4,44 +4,39 @@ const getLanguage = require("./getLanguage")
 const supportedForeignLanguages = ["es","de"]
 
 // This function will convert the incoming non-english from avatar user to english text and return the same.
-function makeEnglish(req,callback){
+function makeEnglish(msg, callback){
 
-  getLanguage(req,(err, lang)=>{
-
-    if(err){
-      console.error(err)
-      callback(null, req.msg)
-    }
+  getLanguage(msg, (err, lang)=>{
+    if(err) callback(err)
     else {
-
-      if(req.lang == "en"){
-        callback(null,req.msg)
+      if(lang == "en"){
+        callback(null, "en", msg)
       }
-      else if (supportedForeignLanguages.includes(req.lang)){
+      else if(supportedForeignLanguages.includes(lang)) {
 
         let translate_options = {
           url: 'http://149.202.214.34:5000/translate?',
           form: {
-            sentence: req.msg,
-            from_lang: req.lang,
+            sentence: msg,
+            from_lang: lang,
             to_lang : 'en'
           }
         }
-        request.post(translate_options, function(error,result){
-          if(error || (result.statusCode == 404)){
-            console.error(error)
-            callback(error,req.msg)
-          }
-          else if(result.body && result.statusCode != 404){
-            let translated = JSON.parse(result.body)
-            let english_msg = translated.Output
-            callback(null, english_msg)
+        request.post(translate_options, function(err, res){
+          if(err) callback(err)
+          else {
+            try {
+              let translated = JSON.parse(res.body)
+              let english_msg = translated.Output
+              callback(null, lang, english_msg)
+            } catch(e) {
+              callback(e)
+            }
           }
         })
       }
       else {
-        req.lang = "Not Supported"
-        callback(null,req.msg)
+        callback(null, null, msg)
       }
     }
   })
