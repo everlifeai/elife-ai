@@ -1,9 +1,9 @@
-// This function will convert the incoming non-english from avatar user to english text and return the same.
-
 "use strict"
 const request = require("request")
 const getLanguage = require("./getLanguage")
+const supportedForeignLanguages = ["es","de"]
 
+// This function will convert the incoming non-english from avatar user to english text and return the same.
 function makeEnglish(req,callback){
 
   getLanguage(req,(err, lang)=>{
@@ -13,12 +13,17 @@ function makeEnglish(req,callback){
       callback(null, req.msg)
     }
     else {
-      if(lang == "es"){
+
+      if(req.lang == "en"){
+        callback(null,req.msg)
+      }
+      else if (supportedForeignLanguages.includes(req.lang)){
+
         let translate_options = {
           url: 'http://149.202.214.34:5000/translate?',
           form: {
             sentence: req.msg,
-            from_lang: "sp",
+            from_lang: req.lang,
             to_lang : 'en'
           }
         }
@@ -34,17 +39,12 @@ function makeEnglish(req,callback){
           }
         })
       }
-      else
-      { if(req.lang == "en"){
-        callback(null,req.msg)
-      }else{
+      else {
         req.lang = "Not Supported"
         callback(null,req.msg)
       }
-      }
     }
   })
-
 }
 
 module.exports = makeEnglish

@@ -1,35 +1,27 @@
-/**
- * This function used for deteing the language for given message
- * if any error or exception default language will english
- * else return the detected language
- */
 const request = require('request')
 
-function getLanguage(req, callback){
+// This function will get the language of the message entered by avatar user.
+function getLanguage(req, callback) {
     let options = {
         url: 'http://149.202.214.34:4001/language_detect?',
         form: {
             msg: req.msg,
         }
-    };
-    request.post(options, function(err,res){
+    }
+    request.post(options, function(err,res) {
         if(err) {
-            console.log(err)
+            console.error(err)
+            req.lang =  "en"
             callback(null,req.lang)
-        }
-
-        else {
+        } else {
             try{
-                console.log(res.body)
                 let out = JSON.parse(res.body)
-
                 req.lang = out.lang
                 callback(null,req.lang)
             }catch(e){
                 console.error(e)
-                callback(null, "en")
+                callback("Sorry! Failed to fetch the language")
             }
-
         }
     })
 }

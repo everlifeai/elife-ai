@@ -98,17 +98,25 @@ function wakeUpAI(cfg) {
         aiSvc.on('get-response', (req, cb) => {
             req.orig = req.msg
             makeEnglish(req, (err, englishmsg) => {
-                    if (!err){
-                        req.msg = englishmsg
-                        getResponse(cfg, req, (err,resp)=>{
-                            if(req.orig != req.msg){
-                                makeOriginal(req, resp, cb)
-                            }
-                            else cb(err,resp)
-                            })
-                        }
+              if (!err){
+                req.msg = englishmsg
+                getResponse(cfg, req, (err,resp)=>{
+                  if(req.orig != req.msg) {
+                    makeOriginal(req.lang, resp, (err, msg)=> {
+                      if(err) {
+                        console.error(err)
+                        cb(null, resp)
+                      } else {
+                        cb(null, msg)
+                      }
                     })
+                  } else {
+                    cb(err,resp)
+                  }
                 })
+              }
+            })
+        })
 
         /*      outcome/
          * Respond to a request for kb information
