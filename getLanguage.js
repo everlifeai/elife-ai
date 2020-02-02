@@ -13,7 +13,8 @@ function getLanguage(msg, callback) {
                 let out = JSON.parse(res.body)
                 callback(null,out.lang)
             } catch(e){
-                callback(e)
+                if(res.body) callback(res.body)
+              else callback(e)
             }
         }
     })
