@@ -98,7 +98,7 @@ function wakeUpAI(cfg) {
          */
         aiSvc.on('get-response', (req, cb) => {
           req.orig = req.msg
-          makeEnglish(req, (err, lang, englishmsg) => {
+          makeEnglish(req.msg, (err, lang, englishmsg) => {
             if(err) {
               console.error(err)
             } else {
