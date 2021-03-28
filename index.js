@@ -76,8 +76,10 @@ function wakeUpAI(cfg) {
             cwd: path.join(__dirname, 'brains/ebrain-aiml'),
             log: path.join(u.logsLoc(), 'aiml-brain.log'),
             stripANSI: true,
-        }, (err) => {
+        }, (err, pi) => {
             if(err) u.showErr(err)
+            process.on('SIGINT', () => pm2.stop(pi))
+            process.on('SIGTERM', () => pm2.stop(pi))
         })
     }
 
