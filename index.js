@@ -7,6 +7,8 @@ const pm2 = require('@elife/pm2')
 const path = require('path')
 const makeOriginal = require("./makeOriginal")
 const makeEnglish = require("./makeEnglish")
+
+
 /*      understand/
  * This is the main entry point where we start.
  *
@@ -16,6 +18,19 @@ const makeEnglish = require("./makeEnglish")
 function main() {
     let conf = loadConfig()
     wakeUpAI(conf)
+    shutdownChildren()
+}
+
+function shutdownChildren() {
+    process.on('SIGINT', stop_1)
+    process.on('SIGTERM', stop_1)
+
+    function stop_1() {
+        pm2.forEach(pi => {
+            if(pi.name) u.showMsg(`Stopping ${pi.name} (pid: ${pi.child.pid})`)
+            pm2.stop(pi)
+        })
+    }
 }
 
 /*      outcome/
@@ -78,8 +93,6 @@ function wakeUpAI(cfg) {
             stripANSI: true,
         }, (err, pi) => {
             if(err) u.showErr(err)
-            process.on('SIGINT', () => pm2.stop(pi))
-            process.on('SIGTERM', () => pm2.stop(pi))
         })
     }
 
