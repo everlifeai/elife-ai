@@ -27,7 +27,7 @@ function shutdownChildren() {
 
     function stop_1() {
         pm2.forEach(pi => {
-            if(pi.name) u.showMsg(`Stopping ${pi.name} (pid: ${pi.child.pid})`)
+            if(pi.name && pi.child) u.showMsg(`Stopping ${pi.name} (pid: ${pi.child.pid})`)
             pm2.stop(pi)
         })
     }
