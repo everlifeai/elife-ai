@@ -4,6 +4,7 @@ const fs = require('fs')
 const u = require('@elife/utils')
 const request = require('request')
 const pm2 = require('@elife/pm2')
+const psTree = require('ps-tree')
 const path = require('path')
 const makeOriginal = require("./makeOriginal")
 const makeEnglish = require("./makeEnglish")
@@ -26,11 +27,17 @@ function shutdownChildren() {
     process.once('SIGTERM', stop_1)
 
     function stop_1() {
-        pm2.forEach(pi => {
-            if(pi.name && pi.child) u.showMsg(`Stopping ${pi.name} (pid: ${pi.child.pid})`)
-            pm2.stop(pi)
+        psTree(process.pid, (err, children) => {
+          if(err) {
+            pm2.forEach(pi => {
+              if(pi.name && pi.child) u.showMsg(`Stopping ${pi.name} (pid: ${pi.child.pid})`)
+              pm2.stop(pi)
+            })
+          } else {
+            children.map(c => process.kill(c.PID))
+          }
+          process.exit()
         })
-        process.exit()
     }
 }
 
