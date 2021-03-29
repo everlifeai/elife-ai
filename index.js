@@ -22,14 +22,15 @@ function main() {
 }
 
 function shutdownChildren() {
-    process.on('SIGINT', stop_1)
-    process.on('SIGTERM', stop_1)
+    process.once('SIGINT', stop_1)
+    process.once('SIGTERM', stop_1)
 
     function stop_1() {
         pm2.forEach(pi => {
             if(pi.name && pi.child) u.showMsg(`Stopping ${pi.name} (pid: ${pi.child.pid})`)
             pm2.stop(pi)
         })
+        process.exit()
     }
 }
 
