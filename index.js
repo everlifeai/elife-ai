@@ -34,7 +34,10 @@ function shutdownChildren() {
               pm2.stop(pi)
             })
           } else {
-            children.map(c => process.kill(c.PID))
+            children.map(c => {
+              u.showMsg(`Stopping child ${c.PID}`)
+              process.kill(c.PID)
+            })
           }
           process.exit()
         })
